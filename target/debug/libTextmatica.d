@@ -1,0 +1,1 @@
+/home/larke/Documents/Coding/Textmatica/target/debug/libTextmatica.rlib: /home/larke/Documents/Coding/Textmatica/src/ast.rs /home/larke/Documents/Coding/Textmatica/src/evaluator.rs /home/larke/Documents/Coding/Textmatica/src/lib.rs /home/larke/Documents/Coding/Textmatica/src/parser.rs

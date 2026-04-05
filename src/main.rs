@@ -1,53 +1,29 @@
-use nom::{
-    bytes::complete::tag,
-    character::complete::{char, digit1},
-    sequence::delimited,
-    IResult,
-    Parser,
-    combinator::{map_res, map},
-};
-
-
-use std::str::FromStr;
-
-fn parse_i32(input: &str) -> IResult<&str, i32> {
-
-    map_res(digit1, i32::from_str).parse(input)
-
-} 
-
-fn parse_braced_number(input: &str) -> IResult<&str, i32> {
-    delimited(
-        char('{'),
-        parse_i32,
-        char('}'),
-    ).parse(input)
-}
-
-
-#[derive(Debug, PartialEq)]
-enum Math {
-    SquareRoot(i32)
-}
-
-fn parse_sqrt(input: &str) -> IResult<&str, Math> {
-    let sqrt_parsers = (tag("\\sqrt"), parse_braced_number);
-
-    map(
-        sqrt_parsers,
-        |(_, number)| Math::SquareRoot(number)
-    ).parse(input)
-}
+use Textmatica::parser::parse_math_expr;
+use Textmatica::evaluator::evaluate;
 
 fn main() {
-    let math_string = "\\sqrt{144} = 12";
+    // The Final Boss Equation: 
+    // -10.5 * 2 + \frac{-100}{5} - (-3.14)
+    // Mathematically: (-21) + (-20) - (-3.14) = -37.86
 
-    match parse_sqrt(math_string) {
-        Ok((leftover, parsed_ast)) => {
-            println!("Success!!");
-            // This should print: Math::SquareRoot(144)
-            println!("Parsed AST: '{:?}'", parsed_ast); 
-            println!("Leftover: '{}'", leftover);
+    let math_string = "+10.5 * 2 + \\frac{-100}{5} - (-3.14)";
+    let correct_result = 10.5*2.0 + (-100.0/5.0) - (-3.14);
+
+    println!("Parsing: {}", math_string);
+    
+    match parse_math_expr(math_string) {
+        Ok((leftover, ast)) => {
+            // Using a clean print so it doesn't take up 5 pages in your terminal!
+            println!("\nParsed AST successfully!"); 
+            
+            let result = evaluate(&ast);
+            println!("FINAL CALCULATED RESULT: {}, should have been: {}", result, correct_result); 
+            
+            if leftover.is_empty() {
+                println!("No leftovers! Perfect parse.");
+            } else {
+                println!("Leftover string: '{}'", leftover);
+            }
         }
         Err(e) => println!("Error: {:?}", e),
     }
